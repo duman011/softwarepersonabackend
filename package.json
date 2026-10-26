@@ -1,0 +1,14 @@
+{
+  "name": "taskflow-gorev-yonetimi",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Taskflow görev yönetimi REST API projesi",
+  "main": "sunucu.js",
+  "scripts": {
+    "start": "node sunucu.js",
+    "dev": "node --watch sunucu.js",
+    "test": "node --test"
+  },
+  "engines": { "node": ">=22" },
+  "dependencies": { "express": "^5.1.0" }
+}

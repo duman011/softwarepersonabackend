@@ -1,0 +1,12 @@
+[
+  {
+    "id": "a4dacfda-f3a9-4c37-b138-b4848b2a8b24",
+    "title": "Görev API'sini hazırla",
+    "description": "Görev ekleme ve listeleme uçlarını geliştir.",
+    "priority": "high",
+    "assignee": "Abdullah",
+    "status": "pending",
+    "createdAt": "2026-10-26T14:20:05.863Z",
+    "updatedAt": "2026-10-26T14:20:05.863Z"
+  }
+]

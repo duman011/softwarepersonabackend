@@ -1,0 +1,379 @@
+{
+  "info": {
+    "name": "Taskflow - Görev Yönetimi",
+    "description": "Önce sunucuyu başlatın. İstekleri sırayla çalıştırın; eklenen görev kimliği otomatik saklanır.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "temelAdres",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "gorevKimligi",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Görev ekle",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{temelAdres}}/tasks",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Görev API'sini hazırla\",\n  \"description\": \"Görev ekleme ve listeleme uçlarını geliştir.\",\n  \"priority\": \"high\",\n  \"assignee\": \"Abdullah\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+              "pm.test('Yanıt içeriği', function () {",
+              "  const gorev = pm.response.json();",
+              "  pm.expect(gorev.status).to.eql('pending');",
+              "  pm.expect(gorev.id).to.be.a('string');",
+              "  pm.collectionVariables.set('gorevKimligi', gorev.id);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Görevleri listele",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{temelAdres}}/tasks"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Yanıt içeriği', function () {",
+              "  const gorevler = pm.response.json();",
+              "  pm.expect(gorevler).to.be.an('array');",
+              "  pm.expect(gorevler.some((gorev) => gorev.id === pm.collectionVariables.get('gorevKimligi'))).to.eql(true);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Görev detayı",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{temelAdres}}/tasks/{{gorevKimligi}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Yanıt içeriği', function () {",
+              "  pm.expect(pm.response.json().id).to.eql(pm.collectionVariables.get('gorevKimligi'));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Görevi güncelle",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{temelAdres}}/tasks/{{gorevKimligi}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"completed\",\n  \"priority\": \"medium\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Yanıt içeriği', function () {",
+              "  pm.expect(pm.response.json().status).to.eql('completed');",
+              "  pm.expect(pm.response.json().priority).to.eql('medium');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04a - Durum filtresi",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{temelAdres}}/tasks?status=completed"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Yanıt içeriği', function () { const govde = pm.response.json(); pm.expect(govde.every((gorev) => gorev.status === 'completed')).to.eql(true); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04b - Öncelik filtresi",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{temelAdres}}/tasks?priority=medium"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Yanıt içeriği', function () { const govde = pm.response.json(); pm.expect(govde.every((gorev) => gorev.priority === 'medium')).to.eql(true); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04c - Görev arama",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{temelAdres}}/tasks/search?keyword=API"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Yanıt içeriği', function () { const govde = pm.response.json(); pm.expect(govde.some((gorev) => gorev.id === pm.collectionVariables.get('gorevKimligi'))).to.eql(true); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04d - Çalışan görevleri",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{temelAdres}}/tasks/assignee/Abdullah"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Yanıt içeriği', function () { const govde = pm.response.json(); pm.expect(govde.every((gorev) => gorev.assignee === 'Abdullah')).to.eql(true); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04e - Sayfalama ve sıralama",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{temelAdres}}/tasks?page=1&limit=1&sort=-createdAt"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Yanıt içeriği', function () { const govde = pm.response.json(); pm.expect(govde.length).to.be.at.most(1); pm.expect(Number(pm.response.headers.get('X-Total-Count'))).to.be.at.least(1); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04f - Tamamlanan raporu",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{temelAdres}}/reports/completed"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Yanıt içeriği', function () { const govde = pm.response.json(); pm.expect(govde.completed).to.be.at.least(1); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04g - Bekleyen raporu",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{temelAdres}}/reports/pending"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Yanıt içeriği', function () { const govde = pm.response.json(); pm.expect(govde.pending).to.be.a('number'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04h - Genel rapor",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{temelAdres}}/reports/summary"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Yanıt içeriği', function () { const govde = pm.response.json(); pm.expect(govde.total).to.eql(govde.pending + govde.in_progress + govde.completed); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04i - Eksik veri kontrolü",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{temelAdres}}/tasks",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"title\": \"\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });",
+              "pm.test('Hata açıklaması', function () { pm.expect(pm.response.json().mesaj).to.be.a('string'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Görevi sil",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{temelAdres}}/tasks/{{gorevKimligi}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 204', function () { pm.response.to.have.status(204); });",
+              "pm.test('Yanıt içeriği', function () {",
+              "  pm.expect(pm.response.text()).to.eql('');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - Silinen görevi sorgula",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{temelAdres}}/tasks/{{gorevKimligi}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 404', function () { pm.response.to.have.status(404); });",
+              "pm.test('Yanıt içeriği', function () {",
+              "  pm.expect(pm.response.json().mesaj).to.eql('Görev bulunamadı.');",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
