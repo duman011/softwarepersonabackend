@@ -2,11 +2,33 @@
 
 Node.js ve Express ile hazırlanan staj projesi. Görev oluşturma, çalışanlara atama, listeleme, detay görüntüleme, güncelleme ve silme işlemleri REST API üzerinden yapılır. Her isteğin yöntemi, adresi ve zamanı terminale yazılır.
 
+![Postman üzerinden görev oluşturma: JSON istek gövdesi ve 201 Created yanıtı](belgeler/ekran_goruntuleri/01_ekleme.png)
+
+*Görev oluşturma isteği ve sunucunun döndürdüğü görev bilgileri.*
+
+[API belgesi](belgeler/api.md) · [Kullanım kılavuzu](belgeler/kullanim_kilavuzu.md) · [Testler ve tüm ekran görüntüleri](belgeler/testler.md) · [Postman koleksiyonu](postman/gorev_yonetimi.postman_collection.json)
+
+## Uygulamadan örnekler
+
+Görev güncelleme, filtreleme ve raporlama işlemlerinin gerçek Postman çıktıları aşağıdadır. Görüntülere tıklayarak tam boyutlarını açabilirsiniz.
+
+| Görev güncelleme | Duruma göre filtreleme |
+| --- | --- |
+| [![Görevin completed durumuna ve medium önceliğine güncellenmesi](belgeler/ekran_goruntuleri/04_guncelleme.png)](belgeler/ekran_goruntuleri/04_guncelleme.png) | [![Yalnızca tamamlanan görevlerin listelenmesi](belgeler/ekran_goruntuleri/04a_durum_filtresi.png)](belgeler/ekran_goruntuleri/04a_durum_filtresi.png) |
+| **Sayfalama ve sıralama** | **Genel rapor** |
+| [![En yeni görevin bir kayıtlık sayfada gösterilmesi](belgeler/ekran_goruntuleri/04e_sayfalama_siralama.png)](belgeler/ekran_goruntuleri/04e_sayfalama_siralama.png) | [![Toplam, bekleyen, devam eden ve tamamlanan görev sayıları](belgeler/ekran_goruntuleri/04h_genel_rapor.png)](belgeler/ekran_goruntuleri/04h_genel_rapor.png) |
+
 ## Kurulum
 
 Node.js 22 veya üzeri ve npm gerekir. Veritabanı kurulumu gerekmez.
 
-1. Proje klasörünü indirin veya GitHub deposunu klonlayın.
+1. Proje klasörünü indirin veya depoyu klonlayın:
+
+   ```bash
+   git clone https://github.com/duman011/softwarepersonabackend.git
+   cd softwarepersonabackend
+   ```
+
 2. Terminalde `package.json` dosyasının bulunduğu klasöre geçin.
 3. Bağımlılıkları kurun ve sunucuyu başlatın:
 
@@ -89,4 +111,3 @@ GET /reports/summary
 ```
 
 Sıralamada `-` azalan sırayı belirtir. Sayfalama yanıtı yine görev dizisidir; filtrelenen toplam görev sayısı `X-Total-Count` başlığındadır. Ayrıntılı istek/yanıt örnekleri [API belgesinde](belgeler/api.md), uygulamadan çağırma örneği [kullanım kılavuzunda](belgeler/kullanim_kilavuzu.md) bulunur.
-
